@@ -54,7 +54,7 @@ def solve(maze: Maze) -> None:
         else:
             for i in ("L", "R", "U", "D"):
                 a = _shift_coordinate(t_cord_i_j[0], t_cord_i_j[1], i)
-                if (a[0] <= len(maze.list_view) and a[1] <= len(maze.list_view[0])) and (maze.list_view[a[0]][a[1]] != "#"):
+                if (0 <= a[0] <= len(maze.list_view) and 0 <= a[1] <= len(maze.list_view[0])) and (maze.list_view[a[0]][a[1]] != "#"):
                    q.put((t_path+i, a))
 
 
