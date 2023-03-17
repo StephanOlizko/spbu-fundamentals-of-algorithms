@@ -1,4 +1,5 @@
 from time import perf_counter
+import queue
 
 
 class Maze:
@@ -39,9 +40,23 @@ class Maze:
 def solve(maze: Maze) -> None:
     path = ""  # solution as a string made of "L", "R", "U", "D"
 
-    ##########################
-    ### PUT YOUR CODE HERE ###
-    ##########################
+    cord_i_j = (0, maze.start_j)
+
+    q = queue.Queue()
+    q.put((path, cord_i_j))
+
+    while not q.empty():
+        (t_path, t_cord_i_j) = q.get()
+
+        if maze.list_view[t_cord_i_j[0]][t_cord_i_j[1]] == "X":
+            path = t_path
+            break
+        else:
+            for i in ("L", "R", "U", "D"):
+                a = _shift_coordinate(t_cord_i_j[0], t_cord_i_j[1], i)
+                if (a[0] <= len(maze.list_view) and a[1] <= len(maze.list_view[0])) and (maze.list_view[a[0]][a[1]] != "#"):
+                   q.put((t_path+i, a))
+
 
     print(f"Found: {path}")
     maze.print(path)
@@ -56,11 +71,11 @@ def _shift_coordinate(i: int, j: int, move: str) -> tuple[int, int]:
         i -= 1
     elif move == "D":
         i += 1
-    return i, j
+    return (i, j)
 
 
 if __name__ == "__main__":
-    maze = Maze.from_file("practicum_2/homework/maze_2.txt")
+    maze = Maze.from_file("maze_2.txt")
     t_start = perf_counter()
     solve(maze)
     t_end = perf_counter()
