@@ -43,7 +43,10 @@ def solve(maze: Maze) -> None:
     cord_i_j = (0, maze.start_j)
 
     q = queue.Queue()
+    visited = []
+
     q.put((path, cord_i_j))
+    visited.append(cord_i_j)
 
     while not q.empty():
         (t_path, t_cord_i_j) = q.get()
@@ -54,8 +57,11 @@ def solve(maze: Maze) -> None:
         else:
             for i in ("L", "R", "U", "D"):
                 a = _shift_coordinate(t_cord_i_j[0], t_cord_i_j[1], i)
-                if (0 <= a[0] <= len(maze.list_view) and 0 <= a[1] <= len(maze.list_view[0])) and (maze.list_view[a[0]][a[1]] != "#"):
-                   q.put((t_path+i, a))
+                if (0 <= a[0] <= len(maze.list_view)) and (0 <= a[1] <= len(maze.list_view[a[0]])):
+                    if maze.list_view[a[0]][a[1]] != "#" and a not in visited:
+                        q.put((t_path+i, a))
+                        visited.append(a)
+
 
 
     print(f"Found: {path}")
