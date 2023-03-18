@@ -43,10 +43,10 @@ def solve(maze: Maze) -> None:
     cord_i_j = (0, maze.start_j)
 
     q = queue.Queue()
-    visited = []
+    visited = set()
 
     q.put((path, cord_i_j))
-    visited.append(cord_i_j)
+    visited.add(cord_i_j)
 
     while not q.empty():
         (t_path, t_cord_i_j) = q.get()
@@ -60,7 +60,7 @@ def solve(maze: Maze) -> None:
                 if (0 <= a[0] <= len(maze.list_view)) and (0 <= a[1] <= len(maze.list_view[a[0]])):
                     if maze.list_view[a[0]][a[1]] != "#" and a not in visited:
                         q.put((t_path+i, a))
-                        visited.append(a)
+                        visited.add(a)
 
 
 
@@ -81,7 +81,7 @@ def _shift_coordinate(i: int, j: int, move: str) -> tuple[int, int]:
 
 
 if __name__ == "__main__":
-    maze = Maze.from_file("maze_2.txt")
+    maze = Maze.from_file("maze_3.txt")
     t_start = perf_counter()
     solve(maze)
     t_end = perf_counter()
