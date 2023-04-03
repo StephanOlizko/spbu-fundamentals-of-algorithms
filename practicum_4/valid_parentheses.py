@@ -40,28 +40,22 @@ class StackOverflowException(BaseException):
     pass
 
 
-def get_starting_symbol(sym: str) -> str:
-    if sym == ")":
-        return "("
-    elif sym == "]":
-        return "["
-    elif sym == "}":
-        return "{"
-    else:
-        raise ValueError(f'Unknown parenthesis: "{sym}"')
-
-
 def are_parentheses_valid(s: str) -> bool:
-    stack = Stack(max_n=100, dtype=str)
+    end_to_start = {
+        ')': '(',
+        ']': '[',
+        '}': '{'
+    }
+    starting_symbols = ['(', '[', '{']
+    stack = Stack(max_n= 100, dtype=str)
+
     stack.push(s[0])
-    starting_symbols = ["(", "{", "["]
-    #    ending_symbols = [')', '}', ']']
     for sym in s[1:]:
         if sym in starting_symbols:
             stack.push(sym)
         else:
             last_sym = stack.pop()
-            if get_starting_symbol(sym) != last_sym:
+            if last_sym != end_to_start[sym]:
                 return False
     return stack.empty()
 
@@ -70,7 +64,7 @@ if __name__ == "__main__":
     # Let's solve Valid Parentheses problem from leetcode.com:
     # https://leetcode.com/problems/valid-parentheses/
     cases = []
-    with open("practicum_4/valid_parentheses_cases.yaml", "r") as f:
+    with open("valid_parentheses_cases.yaml", "r") as f:
         cases = yaml.safe_load(f)
     for c in cases:
         res = are_parentheses_valid(c["input"])
