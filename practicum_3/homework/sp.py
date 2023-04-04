@@ -48,7 +48,7 @@ if __name__ == "__main__":
     G = nx.read_edgelist("graph_1.edgelist", create_using=nx.Graph)
     plot_graph(G)
     shortest_paths = dijkstra_sp(G, source_node="0")
-    test_node = "5"
+    test_node = "4"
     shortest_path_edges = [
         (shortest_paths[test_node][i], shortest_paths[test_node][i + 1])
         for i in range(len(shortest_paths[test_node]) - 1)
