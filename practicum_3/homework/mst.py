@@ -12,35 +12,34 @@ def prim_mst(G: nx.Graph, start_node="0") -> set[tuple[Any, Any]]:
     rest_set = set(G.nodes())  # set of nodes not yet included into MST
     mst_edges = set()  # set of edges constituting MST
 
-    #Словарь соседей для каждой вершины: ключи - вершины, значения - списки кортежей (node_neighbour, weight),
+    #Словарь соседей для каждой вершины: ключи - вершины, значения - списки кортежей (node_neighbour, weight)
     graph = {}
     for graph_node in G.nodes():
         graph[graph_node] = list()
         for node_neighbour in G.neighbors(graph_node):
             graph[graph_node].append((node_neighbour, G.get_edge_data(graph_node, node_neighbour)['weight']))
 
-    #Используем кучу (heap) из модуля heapq для нахождения минимального ребра.
-    #Здесь значения в картеже представлены в таком виде (значение приоритета, начальный узел ребра, конечный узел ребра)
+    #Куча из модуля heapq для нахождения минимального ребра
+    #Значения представлены в таком виде (значение приоритета, начальный узел ребра, конечный узел ребра)
     heap = []
     heapq.heapify(heap)
     heap = [(0, start_node, start_node)]
 
     while heap:
-        #Извлекаем минимальное ребро из кучи.
+        #Извлекаем минимальное ребро из кучи
         min_edge = heapq.heappop(heap)
         if min_edge[2] in mst_set:
             continue
 
-        #Добавляем минимальное ребро в MST и помечаем соответствующие вершины как добавленные.
+        #Добавляем минимальное ребро в MST и помечаем соответствующие вершины как добавленные
         mst_edges.add((min_edge[1], min_edge[2]))
         mst_set.add(min_edge[2])
 
-        #Добавляем смежные ребра из новой вершины.
+        #Добавляем смежные ребра из новой вершины
         for graph_node_next, weight in graph[min_edge[2]]:
             if graph_node_next not in mst_set:
                 heapq.heappush(heap, (weight, min_edge[2], graph_node_next))
 
-    print(graph)
     return mst_edges
 
 
