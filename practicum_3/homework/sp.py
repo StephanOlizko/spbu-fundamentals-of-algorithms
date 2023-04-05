@@ -22,24 +22,19 @@ def dijkstra_sp(G: nx.Graph, source_node="0") -> dict[Any, list[Any]]:
         if min_dist > distances[min_node]:
             continue
 
-        shortest_paths[min_node].append(min_node)
-
-        #Обновляем расстояния до соседних вершин
+        # Обновляем расстояния до соседних вершин
         for neighbor in G.neighbors(min_node):
             new_dist = distances[min_node] + G.edges[min_node, neighbor]['weight']
 
-            #Если новое расстояние меньше текущего, то обновляем текущее и добавляем соседнюю вершину в очередь
+            # Если новое расстояние меньше текущего, то обновляем текущее и добавляем соседнюю вершину в очередь
             if new_dist < distances[neighbor]:
                 distances[neighbor] = new_dist
                 heapq.heappush(prqueue, (new_dist, neighbor))
-                shortest_paths[neighbor] = shortest_paths[min_node] + [min_node]
+                shortest_paths[neighbor] = shortest_paths[min_node] + [neighbor]
 
-    #Добавляем начальную вершину в качестве первого элемента в список кратчайшего пути для каждой вершины
-    for node in G.nodes():
-        if node == source_node:
-            shortest_paths[node] = []
-        else:
-            shortest_paths[node].append(node)
+    # Добавляем начальный узел в каждый путь (для корректного отображения)
+    for dist_node in shortest_paths.keys():
+        shortest_paths[dist_node].insert(0, source_node)
 
     return shortest_paths
 
@@ -48,7 +43,7 @@ if __name__ == "__main__":
     G = nx.read_edgelist("graph_1.edgelist", create_using=nx.Graph)
     plot_graph(G)
     shortest_paths = dijkstra_sp(G, source_node="0")
-    test_node = "4"
+    test_node = "1"
     shortest_path_edges = [
         (shortest_paths[test_node][i], shortest_paths[test_node][i + 1])
         for i in range(len(shortest_paths[test_node]) - 1)
