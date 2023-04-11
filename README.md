@@ -1,6 +1,19 @@
 # spbu-fundamentals-of-algorithms
 Materials for the practicum for "Fundamentals of Algorithms" course at SpbU
 
+## Getting started
+
+Set up your environment
+
+### VSCode
+
+Go to `Run and Debug` in the left panel, create a new launch file, select `Python File` and add the following field:
+```yaml
+"env": {
+    "PYTHONPATH": "${workspaceFolder}${pathSeparator}${env:PYTHONPATH}"
+}
+```
+
 ## Practicum 1
 
 We study basic tools necessary for the rest of the course: `python`, `numpy` and  `matplotlib`. It is assumed that a student has some decent knowledge of python though he/she is not very experienced in it.
