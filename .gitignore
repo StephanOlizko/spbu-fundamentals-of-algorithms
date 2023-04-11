@@ -131,3 +131,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+*.xml
+.idea/spbu-fundamentals-of-algorithms.iml
