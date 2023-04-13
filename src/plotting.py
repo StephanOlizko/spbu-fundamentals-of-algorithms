@@ -51,7 +51,7 @@ def plot_points(points: NDArray, convex_hull: NDArray = None, **kwargs) -> None:
         convex_hull = np.concatenate(
             (convex_hull, convex_hull[0, :].reshape(1, -1)), axis=0
         )
-        ax.plot(convex_hull[:, 0], convex_hull[:, 1], "-", linewidth=4, zorder=-10)
+        ax.plot(convex_hull[:-1, 0], convex_hull[:-1, 1], "-", linewidth=4, zorder=-10)
     ax.grid()
     fig.tight_layout()
     plt.show()
