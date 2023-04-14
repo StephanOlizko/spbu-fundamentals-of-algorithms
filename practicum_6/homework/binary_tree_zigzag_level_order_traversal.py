@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import deque
+from queue import Queue
 from dataclasses import dataclass
 from typing import Any
 
@@ -29,20 +29,34 @@ class BinaryTree:
 
     def zigzag_level_order_traversal( self ) -> list[Any]:
 
-        if not self.root: return []
-        queue = deque([self.root])
-        result, direction = [], 1
+        if not self.root:
+            return []
 
-        while queue:
-            level = []
-            for i in range(len(queue)):
-                node = queue.popleft()
-                level.append(node.data)
-                if node.left:  queue.append(node.left)
-                if node.right: queue.append(node.right)
-            result.append(level[::direction])
-            direction *= (-1)
-        return result
+        queue = Queue()
+        queue.put(self.root)
+
+        res = []
+        curr = []
+        level = 0
+
+        while not queue.empty():
+            size = queue.qsize()
+            curr = []
+            for sz in range(size):
+                temp = queue.get()
+                if level % 2 == 0:
+                    curr.append(temp.data)
+                else:
+                    curr.insert(0, temp.data)
+
+                if temp.left:
+                    queue.put(temp.left)
+                if temp.right:
+                    queue.put(temp.right)
+
+            level = not level
+            res.append(curr)
+        return res
 
 
 def build_tree( list_view: list[Any] ) -> BinaryTree:
@@ -51,25 +65,21 @@ def build_tree( list_view: list[Any] ) -> BinaryTree:
     if not list_view:
         return bt
 
-    n = len(list_view)
     root = Node(list_view[0])
+    stack = [(root, 0)]
 
-    def build( node, i ):
-        if i < n:
-            left_idx = 2 * i + 1
-            right_idx = 2 * i + 2
+    while stack:
+        node, list_iter = stack.pop()
 
-            if left_idx < n and list_view[left_idx] is not None:
-                node.left = Node(list_view[left_idx])
-                build(node.left, left_idx)
+        if 2 * list_iter + 1 < len(list_view) and list_view[2 * list_iter + 1] is not None:
+            node.left = Node(list_view[2 * list_iter + 1])
+            stack.append((node.left, 2 * list_iter + 1))
 
-            if right_idx < n and list_view[right_idx] is not None:
-                node.right = Node(list_view[right_idx])
-                build(node.right, right_idx)
+        if 2 * list_iter + 2 < len(list_view) and list_view[2 * list_iter + 2] is not None:
+            node.right = Node(list_view[2 * list_iter + 2])
+            stack.append((node.right, 2 * list_iter + 2))
 
-    build(root, 0)
     bt.root = root
-
     return bt
 
 
