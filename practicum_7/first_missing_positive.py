@@ -5,11 +5,24 @@ class Solution(object):
         :rtype: int
         """
 
-        ##########################
-        ### PUT YOUR CODE HERE ###
-        ##########################
+        ans = 1
+        c = {}
+        for i in range(len(nums)):
+            if nums[i] <= 0:
+                pass
+            else:
+                if nums[i] == ans:
+                    ans += 1
+                elif nums[i] < ans:
+                    pass
+                elif nums[i] > ans:
+                    c[nums[i]] = nums[i]
+        while ans in c:
+            ans += 1
+        print(ans)
+        return ans
 
-        pass
+        #pass
 
 
 if __name__ == "__main__":
