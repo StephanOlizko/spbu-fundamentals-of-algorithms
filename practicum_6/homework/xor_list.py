@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 import ctypes
+import time
 
 import yaml
 
@@ -9,20 +10,21 @@ import yaml
 @dataclass
 class Element:
     key: Any = None
-    #data: Any = None
+    data: Any = None
     np: int = None
 
-    def next( self, predecessor ) -> Element:
-        return ctypes.cast(id(predecessor) ^ self.np, ctypes.py_object).value
+    def next( self, predecessor_id ) -> Element:
+        return ctypes.cast(predecessor_id ^ self.np, ctypes.py_object).value
 
-    def prev( self, successor ) -> Element:
-        return ctypes.cast(id(successor) ^ self.np, ctypes.py_object).value
+    def prev( self, successor_id ) -> Element:
+        return ctypes.cast(successor_id ^ self.np, ctypes.py_object).value
 
 
 class XorDoublyLinkedList:
     def __init__( self ) -> None:
         self.head: Element = None
         self.tail: Element = None
+        self.nodes_list: list = []  #Это костыль, использующийся для того чтобы питоновский garbage collector не удалял ноды.
 
 
     def __repr__( self ) -> str:
@@ -31,15 +33,7 @@ class XorDoublyLinkedList:
     def __str__( self ) -> str:
         node_keys = []
 
-        t_el = self.head
-        predecessor = self.tail
-        successor = t_el.next(predecessor)
-        while successor != self.head:
-            node_keys.append(str(t_el.key))
-            predecessor = t_el
-            t_el = successor
-            successor = t_el.next(predecessor)
-
+        node_keys = self.to_pylist()
         return " <-> ".join(node_keys)
 
     def to_pylist( self ) -> list[Any]:
@@ -48,13 +42,12 @@ class XorDoublyLinkedList:
         if self.empty():
             return py_list
         else:
-            predecessor = self.tail
+            predecessor_id = 0
             t_el = self.head
             py_list.append(t_el.key)
 
             while t_el != self.tail:
-                t_el = t_el.next(predecessor)
-                predecessor = t_el
+                t_el, predecessor_id = t_el.next(predecessor_id), id(t_el)
                 py_list.append(t_el.key)
 
         return py_list
@@ -62,12 +55,22 @@ class XorDoublyLinkedList:
     def empty( self ):
         return self.head is None
 
-    def search( self, key: Any) -> Element:
+    def search( self, key: Any ) -> Element:
         """Complexity: O(n)"""
+        if self.empty():
+            return None
+        else:
+            predecessor_id = 0
+            t_el = self.head
 
-        pass
+            while t_el != self.tail:
+                if t_el.key == key:
+                    return t_el
+                t_el, predecessor_id = t_el.next(predecessor_id), id(t_el)
 
-    def insert( self, x: Any ) -> None:
+        return None
+
+    def insert( self, x: Any, data=None ) -> None:
         """Insert to the front of the list (i.e., it is 'prepend')
         Complexity: O(1)
         """
@@ -75,38 +78,46 @@ class XorDoublyLinkedList:
         elem = Element(key=x)
 
         if not self.empty():
-            elem.np = id(self.tail) ^ id(self.head)
+            elem.np = id(self.head)
+            elem.data = data
+            self.nodes_list.append(elem)
 
             self.head.np = id(elem) ^ self.head.np
-            self.tail.np = id(elem) ^ self.tail.np
             self.head = elem
-
         else:
-            elem.np = id(elem) ^ id(elem)
+            elem.np = 0
+            elem.data = data
             self.head = elem
             self.tail = elem
-
+            self.nodes_list.append(elem)
 
     def remove( self, x: Any ) -> None:
         """Remove x from the list
         Complexity: O(1)
         Note: My complexity is O(n), don`t know how to reduce it to O(1)
         """
+        if self.empty():
+            return None
+        else:
+            predecessor_id = 0
+            t_el = self.head
 
-        ##########################
-        ### PUT YOUR CODE HERE ###
-        ##########################
+            while t_el != self.tail:
+                if t_el.key == x:
+                    successor = t_el.next(predecessor_id)
+                    predecessor = ctypes.cast(predecessor_id, ctypes.py_object).value
+                    successor.np = successor.np ^ id(t_el) ^ id(predecessor)
+                    predecessor.np = predecessor.np ^ id(t_el) ^ id(successor)
+                    self.nodes_list.remove(t_el)
+                    return None
 
-        pass
+                t_el, predecessor_id = t_el.next(predecessor_id), id(t_el)
 
     def reverse( self ) -> XorDoublyLinkedList:
         """Returns the same list but in the reserved order
         Complexity: O(1)
         """
-
-        ##########################
-        ### PUT YOUR CODE HERE ###
-        ##########################
+        self.head, self.tail = self.tail, self.head
 
         return self
 
@@ -125,16 +136,12 @@ if __name__ == "__main__":
         cases = yaml.safe_load(f)
 
     for i, c in enumerate(cases):
-        if i == 1:
-            break
-
         l = XorDoublyLinkedList()
         for el in reversed(c["input"]["list"]):
             l.insert(el)
-            print(el, l.to_pylist())
         for op_info in c["input"]["ops"]:
             if op_info["op"] == "insert":
-                l.remove(op_info["key"])
+                l.insert(op_info["key"])
             elif op_info["op"] == "remove":
                 l.remove(op_info["key"])
             elif op_info["op"] == "reverse":
